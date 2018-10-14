@@ -180,6 +180,7 @@ func (log *Logger) Debug(msg string, fields ...Field) {
 	}
 }
 
+// info 级别
 // Info logs a message at InfoLevel. The message includes any fields passed
 // at the log site, as well as any fields accumulated on the logger.
 func (log *Logger) Info(msg string, fields ...Field) {

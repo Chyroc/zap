@@ -20,7 +20,10 @@
 
 package zapcore
 
-import "go.uber.org/multierr"
+import (
+	"go.uber.org/multierr"
+	"go.uber.org/zap/debug"
+)
 
 type hooked struct {
 	Core
@@ -45,6 +48,7 @@ func (h *hooked) Check(ent Entry, ce *CheckedEntry) *CheckedEntry {
 	// also gives the downstream a chance to register itself directly with the
 	// CheckedEntry.
 	if downstream := h.Core.Check(ent, ce); downstream != nil {
+		debug.Println( "hooked.Check")
 		return downstream.AddCore(ent, h)
 	}
 	return ce

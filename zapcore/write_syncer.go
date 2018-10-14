@@ -29,6 +29,8 @@ import (
 
 // A WriteSyncer is an io.Writer that can also flush any buffered data. Note
 // that *os.File (and thus, os.Stderr and os.Stdout) implement WriteSyncer.
+//
+// 一个 write 接口 + sync 方法 *os.File， os.Stderr ， os.Stdout
 type WriteSyncer interface {
 	io.Writer
 	Sync() error

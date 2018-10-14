@@ -33,7 +33,11 @@ func Array(key string, val zapcore.ArrayMarshaler) Field {
 	return Field{Key: key, Type: zapcore.ArrayMarshalerType, Interface: val}
 }
 
+// 下面的都是 array 的 值
+
 // Bools constructs a field that carries a slice of bools.
+//
+// 多个bool的field
 func Bools(key string, bs []bool) Field {
 	return Array(key, bools(bs))
 }

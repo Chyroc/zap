@@ -23,6 +23,8 @@ package zapcore
 // ObjectMarshaler allows user-defined types to efficiently add themselves to the
 // logging context, and to selectively omit information which shouldn't be
 // included in logs (e.g., passwords).
+//
+// 定义一个 object 接口
 type ObjectMarshaler interface {
 	MarshalLogObject(ObjectEncoder) error
 }
@@ -39,6 +41,8 @@ func (f ObjectMarshalerFunc) MarshalLogObject(enc ObjectEncoder) error {
 // ArrayMarshaler allows user-defined types to efficiently add themselves to the
 // logging context, and to selectively omit information which shouldn't be
 // included in logs (e.g., passwords).
+//
+// 定义了一个 array 的 marshaler
 type ArrayMarshaler interface {
 	MarshalLogArray(ArrayEncoder) error
 }

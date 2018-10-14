@@ -29,6 +29,8 @@ const _size = 1024 // by default, create 1 KiB buffers
 
 // Buffer is a thin wrapper around a byte slice. It's intended to be pooled, so
 // the only way to construct one is via a Pool.
+//
+// 一个自定义的buffer
 type Buffer struct {
 	bs   []byte
 	pool Pool
@@ -46,6 +48,7 @@ func (b *Buffer) AppendString(s string) {
 
 // AppendInt appends an integer to the underlying buffer (assuming base 10).
 func (b *Buffer) AppendInt(i int64) {
+	// 学习：AppendInt
 	b.bs = strconv.AppendInt(b.bs, i, 10)
 }
 
@@ -67,11 +70,14 @@ func (b *Buffer) AppendFloat(f float64, bitSize int) {
 }
 
 // Len returns the length of the underlying byte slice.
+// 长度
 func (b *Buffer) Len() int {
 	return len(b.bs)
 }
 
 // Cap returns the capacity of the underlying byte slice.
+// 容量
+// 疑问：这个性能应该小于strings.Builder吧
 func (b *Buffer) Cap() int {
 	return cap(b.bs)
 }
@@ -89,17 +95,20 @@ func (b *Buffer) String() string {
 // Reset resets the underlying byte slice. Subsequent writes re-use the slice's
 // backing array.
 func (b *Buffer) Reset() {
+	// reset，但是底层数据没有更新，所以会复用
 	b.bs = b.bs[:0]
 }
 
 // Write implements io.Writer.
 func (b *Buffer) Write(bs []byte) (int, error) {
+	// 和append一样，但是实现了 writer 接口
 	b.bs = append(b.bs, bs...)
 	return len(bs), nil
 }
 
 // TrimNewline trims any final "\n" byte from the end of the buffer.
 func (b *Buffer) TrimNewline() {
+	// 去掉所有的 \n
 	if i := len(b.bs) - 1; i >= 0 {
 		if b.bs[i] == '\n' {
 			b.bs = b.bs[:i]

@@ -22,6 +22,7 @@ package zapcore
 
 import (
 	"fmt"
+	"go.uber.org/zap/debug"
 	"sync"
 
 	"go.uber.org/zap/buffer"
@@ -43,6 +44,7 @@ func putSliceEncoder(e *sliceArrayEncoder) {
 	_sliceEncoderPool.Put(e)
 }
 
+// 实现了4个接口
 type consoleEncoder struct {
 	*jsonEncoder
 }
@@ -56,6 +58,7 @@ type consoleEncoder struct {
 // encoder configuration, it will omit any element whose key is set to the empty
 // string.
 func NewConsoleEncoder(cfg EncoderConfig) Encoder {
+	// console 的 encoder ，在逗号或者冒号后又空格
 	return consoleEncoder{newJSONEncoder(cfg, true)}
 }
 
@@ -64,6 +67,8 @@ func (c consoleEncoder) Clone() Encoder {
 }
 
 func (c consoleEncoder) EncodeEntry(ent Entry, fields []Field) (*buffer.Buffer, error) {
+	debug.Println("consoleEncoder.EncodeEntry")
+
 	line := bufferpool.Get()
 
 	// We don't want the entry's metadata to be quoted and escaped (if it's

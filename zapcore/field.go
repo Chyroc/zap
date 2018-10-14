@@ -32,9 +32,11 @@ import (
 // and how it should be serialized.
 type FieldType uint8
 
+// 类型
+
 const (
 	// UnknownType is the default field type. Attempting to add it to an encoder will panic.
-	UnknownType FieldType = iota
+	UnknownType FieldType = iota // 0
 	// ArrayMarshalerType indicates that the field carries an ArrayMarshaler.
 	ArrayMarshalerType
 	// ObjectMarshalerType indicates that the field carries an ObjectMarshaler.
@@ -54,7 +56,7 @@ const (
 	// Float64Type indicates that the field carries a float64.
 	Float64Type
 	// Float32Type indicates that the field carries a float32.
-	Float32Type
+	Float32Type  // 10
 	// Int64Type indicates that the field carries an int64.
 	Int64Type
 	// Int32Type indicates that the field carries an int32.
@@ -74,12 +76,12 @@ const (
 	// Uint16Type indicates that the field carries a uint16.
 	Uint16Type
 	// Uint8Type indicates that the field carries a uint8.
-	Uint8Type
+	Uint8Type  // 20
 	// UintptrType indicates that the field carries a uintptr.
 	UintptrType
 	// ReflectType indicates that the field carries an interface{}, which should
 	// be serialized using reflection.
-	ReflectType
+	ReflectType  // 22 <- map[string]interface{}
 	// NamespaceType signals the beginning of an isolated namespace. All
 	// subsequent fields should be added to the new namespace.
 	NamespaceType
@@ -94,16 +96,20 @@ const (
 // A Field is a marshaling operation used to add a key-value pair to a logger's
 // context. Most fields are lazily marshaled, so it's inexpensive to add fields
 // to disabled debug-level log statements.
+//
+// 添加 k-v 到logger, marshaled 都是懒加载的
 type Field struct {
 	Key       string
 	Type      FieldType
 	Integer   int64
 	String    string
-	Interface interface{}
+	Interface interface{} //存储数据
 }
 
 // AddTo exports a field through the ObjectEncoder interface. It's primarily
 // useful to library authors, and shouldn't be necessary in most applications.
+//
+// 定义 field 的add方法，将数据变成数据添加到 ObjectEncoder
 func (f Field) AddTo(enc ObjectEncoder) {
 	var err error
 
@@ -194,8 +200,10 @@ func (f Field) Equals(other Field) bool {
 	}
 }
 
+// 遍历 field 添加到buffer
 func addFields(enc ObjectEncoder, fields []Field) {
 	for i := range fields {
+		// 疑问：这样可以提供效率？
 		fields[i].AddTo(enc)
 	}
 }

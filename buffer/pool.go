@@ -29,8 +29,10 @@ type Pool struct {
 
 // NewPool constructs a new Pool.
 func NewPool() Pool {
+	// 新建pool
 	return Pool{p: &sync.Pool{
 		New: func() interface{} {
+			// new方法是：搞一个 buffer ：长度0，容量1024的bytes
 			return &Buffer{bs: make([]byte, 0, _size)}
 		},
 	}}

@@ -22,6 +22,7 @@ package zapcore
 
 import (
 	"fmt"
+	"go.uber.org/zap/debug"
 	"strings"
 	"sync"
 	"time"
@@ -32,6 +33,7 @@ import (
 	"go.uber.org/multierr"
 )
 
+// _cePool 是一个 *CheckedEntry  的pool
 var (
 	_cePool = sync.Pool{New: func() interface{} {
 		// Pre-allocate some space for cores.
@@ -192,6 +194,8 @@ func (ce *CheckedEntry) reset() {
 // Write writes the entry to the stored Cores, returns any errors, and returns
 // the CheckedEntry reference to a pool for immediate re-use. Finally, it
 // executes any required CheckWriteAction.
+//
+// 写
 func (ce *CheckedEntry) Write(fields ...Field) {
 	if ce == nil {
 		return
@@ -210,8 +214,10 @@ func (ce *CheckedEntry) Write(fields ...Field) {
 	}
 	ce.dirty = true
 
+	// 写数据
 	var err error
 	for i := range ce.cores {
+		fmt.Printf("%#v\n", ce.cores[i])
 		err = multierr.Append(err, ce.cores[i].Write(ce.Entry, fields))
 	}
 	if ce.ErrorOutput != nil {
@@ -240,6 +246,8 @@ func (ce *CheckedEntry) AddCore(ent Entry, core Core) *CheckedEntry {
 		ce = getCheckedEntry()
 		ce.Entry = ent
 	}
+	// 添加 ce
+	debug.Println("ce.cores.append")
 	ce.cores = append(ce.cores, core)
 	return ce
 }

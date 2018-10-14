@@ -23,6 +23,7 @@ package zapcore
 import (
 	"encoding/base64"
 	"encoding/json"
+	"go.uber.org/zap/debug"
 	"math"
 	"sync"
 	"time"
@@ -56,10 +57,16 @@ func putJSONEncoder(enc *jsonEncoder) {
 	_jsonPool.Put(enc)
 }
 
+// colons 冒号
+// commas 逗号
+
 type jsonEncoder struct {
 	*EncoderConfig
-	buf            *buffer.Buffer
-	spaced         bool // include spaces after colons and commas
+	buf *buffer.Buffer
+
+	// 在逗号和冒号后又空格？？
+	spaced bool // include spaces after colons and commas
+
 	openNamespaces int
 
 	// for encoding generic values by reflection
@@ -84,7 +91,7 @@ func NewJSONEncoder(cfg EncoderConfig) Encoder {
 func newJSONEncoder(cfg EncoderConfig, spaced bool) *jsonEncoder {
 	return &jsonEncoder{
 		EncoderConfig: &cfg,
-		buf:           bufferpool.Get(),
+		buf:           bufferpool.Get(), // 使用 buffer 接口的pool 新建一个 Buffer
 		spaced:        spaced,
 	}
 }
@@ -95,20 +102,25 @@ func (enc *jsonEncoder) AddArray(key string, arr ArrayMarshaler) error {
 }
 
 func (enc *jsonEncoder) AddObject(key string, obj ObjectMarshaler) error {
+	debug.Println("jsonEncoder.AddObject", key)
 	enc.addKey(key)
 	return enc.AppendObject(obj)
 }
 
 func (enc *jsonEncoder) AddBinary(key string, val []byte) {
+	// 添加 binary
+	// bytes -> base64，到 string
 	enc.AddString(key, base64.StdEncoding.EncodeToString(val))
 }
 
 func (enc *jsonEncoder) AddByteString(key string, val []byte) {
+	// bytes 表示的 string
 	enc.addKey(key)
 	enc.AppendByteString(val)
 }
 
 func (enc *jsonEncoder) AddBool(key string, val bool) {
+	// 添加 k-v bool，k-v之间有可选的 sep
 	enc.addKey(key)
 	enc.AppendBool(val)
 }
@@ -133,6 +145,7 @@ func (enc *jsonEncoder) AddInt64(key string, val int64) {
 	enc.AppendInt64(val)
 }
 
+// reset reflect的buffer，如果为nil，通过pool新建一个，否则，reset一下
 func (enc *jsonEncoder) resetReflectBuf() {
 	if enc.reflectBuf == nil {
 		enc.reflectBuf = bufferpool.Get()
@@ -143,14 +156,19 @@ func (enc *jsonEncoder) resetReflectBuf() {
 }
 
 func (enc *jsonEncoder) AddReflected(key string, obj interface{}) error {
+	debug.Println("jsonEncoder.AddReflected", key)
+
 	enc.resetReflectBuf()
-	err := enc.reflectEnc.Encode(obj)
+	err := enc.reflectEnc.Encode(obj)// 通过json自带的encode将 interface转成 string
 	if err != nil {
 		return err
 	}
-	enc.reflectBuf.TrimNewline()
+	enc.reflectBuf.TrimNewline() // 去除换行
+
+	// 添加key 和 value
 	enc.addKey(key)
 	_, err = enc.buf.Write(enc.reflectBuf.Bytes())
+
 	return err
 }
 
@@ -193,11 +211,16 @@ func (enc *jsonEncoder) AppendObject(obj ObjectMarshaler) error {
 
 func (enc *jsonEncoder) AppendBool(val bool) {
 	enc.addElementSeparator()
+
 	enc.buf.AppendBool(val)
 }
 
 func (enc *jsonEncoder) AppendByteString(val []byte) {
+	// 添加 bytes 表示的 string
+
 	enc.addElementSeparator()
+
+	// 将字符串在两个冒号中间写一下
 	enc.buf.AppendByte('"')
 	enc.safeAddByteString(val)
 	enc.buf.AppendByte('"')
@@ -266,6 +289,7 @@ func (enc *jsonEncoder) AppendUint64(val uint64) {
 	enc.buf.AppendUint(val)
 }
 
+// 基本类型的append
 func (enc *jsonEncoder) AddComplex64(k string, v complex64) { enc.AddComplex128(k, complex128(v)) }
 func (enc *jsonEncoder) AddFloat32(k string, v float32)     { enc.AddFloat64(k, float64(v)) }
 func (enc *jsonEncoder) AddInt(k string, v int)             { enc.AddInt64(k, int64(v)) }
@@ -305,7 +329,12 @@ func (enc *jsonEncoder) clone() *jsonEncoder {
 	return clone
 }
 
+// 这个就是encode位置
 func (enc *jsonEncoder) EncodeEntry(ent Entry, fields []Field) (*buffer.Buffer, error) {
+	debug.Println("jsonEncoder.EncodeEntry")
+
+	// 使用 buffer.Buffer 拼接字符串
+
 	final := enc.clone()
 	final.buf.AppendByte('{')
 
@@ -385,27 +414,48 @@ func (enc *jsonEncoder) closeOpenNamespaces() {
 	}
 }
 
+// 添加 key
 func (enc *jsonEncoder) addKey(key string) {
+	//
 	enc.addElementSeparator()
+
+	// 在两个双引号之间添加key
 	enc.buf.AppendByte('"')
 	enc.safeAddString(key)
 	enc.buf.AppendByte('"')
+
+	// 添加冒号
 	enc.buf.AppendByte(':')
+
+	// 可选的空格
 	if enc.spaced {
 		enc.buf.AppendByte(' ')
 	}
 }
 
+// 在两个元素之间添加逗号，以及可选的空格
+// 如果最后一个元素是：
+//   {[：最后一个元素，不用逗号
+//   :：是冒号，也不需要
+//   ,空格：以及有一个逗号了，不需要
 func (enc *jsonEncoder) addElementSeparator() {
+	// 添加 sep
 	last := enc.buf.Len() - 1
 	if last < 0 {
 		return
 	}
+
+	// 判断最后一个byte
 	switch enc.buf.Bytes()[last] {
 	case '{', '[', ':', ',', ' ':
+		// 如果
 		return
 	default:
+		// 否则
+		// 添加一个,再加一个
 		enc.buf.AppendByte(',')
+
+		// 逗号或者冒号后有一个空格
 		if enc.spaced {
 			enc.buf.AppendByte(' ')
 		}

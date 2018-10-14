@@ -20,6 +20,10 @@
 
 package zapcore
 
+import (
+	"go.uber.org/zap/debug"
+)
+
 // Core is a minimal, fast logger interface. It's designed for library authors
 // to wrap in a more user-friendly API.
 type Core interface {
@@ -77,21 +81,30 @@ func (c *ioCore) With(fields []Field) Core {
 
 func (c *ioCore) Check(ent Entry, ce *CheckedEntry) *CheckedEntry {
 	if c.Enabled(ent.Level) {
+		debug.Println( "ioCore.Check")
 		return ce.AddCore(ent, c)
 	}
 	return ce
 }
 
+// 这个是写
 func (c *ioCore) Write(ent Entry, fields []Field) error {
+	debug.Println("io.Write")
+
 	buf, err := c.enc.EncodeEntry(ent, fields)
 	if err != nil {
 		return err
 	}
+
+	// 写，然后清空内存
 	_, err = c.out.Write(buf.Bytes())
 	buf.Free()
 	if err != nil {
 		return err
 	}
+
+	// 如果大于 error 错误（panic）
+	// 不懂？？
 	if ent.Level > ErrorLevel {
 		// Since we may be crashing the program, sync the output. Ignore Sync
 		// errors, pending a clean solution to issue #370.

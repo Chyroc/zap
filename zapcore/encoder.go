@@ -344,5 +344,7 @@ type Encoder interface {
 
 	// EncodeEntry encodes an entry and fields, along with any accumulated
 	// context, into a byte buffer and returns it.
+	//
+	// 将fields 变成 自定义的 buffer
 	EncodeEntry(Entry, []Field) (*buffer.Buffer, error)
 }
