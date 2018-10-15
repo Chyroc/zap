@@ -42,55 +42,55 @@ const (
 	// UnknownType is the default field type. Attempting to add it to an encoder will panic.
 	UnknownType FieldType = iota // 未使用
 	// ArrayMarshalerType indicates that the field carries an ArrayMarshaler.
-	ArrayMarshalerType// 存于 Interface
+	ArrayMarshalerType // 存于 Interface
 	// ObjectMarshalerType indicates that the field carries an ObjectMarshaler.
-	ObjectMarshalerType// 存于 Interface
+	ObjectMarshalerType // 存于 Interface
 	// BinaryType indicates that the field carries an opaque binary blob.
-	BinaryType// 存于 Interface
+	BinaryType // 存于 Interface
 	// BoolType indicates that the field carries a bool.
-	BoolType// 存于 Integer
+	BoolType // 存于 Integer
 	// ByteStringType indicates that the field carries UTF-8 encoded bytes.
-	ByteStringType  // 存于 Interface
+	ByteStringType // 存于 Interface
 	// Complex128Type indicates that the field carries a complex128.
-	Complex128Type// 存于 Interface
+	Complex128Type // 存于 Interface
 	// Complex64Type indicates that the field carries a complex128.
-	Complex64Type// 存于 Interface
+	Complex64Type // 存于 Interface
 	// DurationType indicates that the field carries a time.Duration.
-	DurationType// 存于 Integer
+	DurationType // 存于 Integer
 	// Float64Type indicates that the field carries a float64.
-	Float64Type// 存于 Integer
+	Float64Type // 存于 Integer
 	// Float32Type indicates that the field carries a float32.
 	Float32Type // 存于 Integer
 	// Int64Type indicates that the field carries an int64.
 	Int64Type // 存于 Integer
 	// Int32Type indicates that the field carries an int32.
-	Int32Type// 存于 Integer
+	Int32Type // 存于 Integer
 	// Int16Type indicates that the field carries an int16.
-	Int16Type// 存于 Integer
+	Int16Type // 存于 Integer
 	// Int8Type indicates that the field carries an int8.
-	Int8Type// 存于 Integer
+	Int8Type // 存于 Integer
 	// StringType indicates that the field carries a string.
-	StringType// 存于 String
+	StringType // 存于 String
 	// TimeType indicates that the field carries a time.Time.
 	TimeType // 秒存于 Integer，Location存于interface
 	// Uint64Type indicates that the field carries a uint64.
-	Uint64Type// 存于 Integer
+	Uint64Type // 存于 Integer
 	// Uint32Type indicates that the field carries a uint32.
-	Uint32Type// 存于 Integer
+	Uint32Type // 存于 Integer
 	// Uint16Type indicates that the field carries a uint16.
-	Uint16Type// 存于 Integer
+	Uint16Type // 存于 Integer
 	// Uint8Type indicates that the field carries a uint8.
-	Uint8Type  // 存于 Integer
+	Uint8Type // 存于 Integer
 	// UintptrType indicates that the field carries a uintptr.
-	UintptrType// 存于 Integer
+	UintptrType // 存于 Integer
 	// ReflectType indicates that the field carries an interface{}, which should
 	// be serialized using reflection.
-	ReflectType  // 存于 Interface
+	ReflectType // 存于 Interface
 	// NamespaceType signals the beginning of an isolated namespace. All
 	// subsequent fields should be added to the new namespace.
-	NamespaceType// 没有valud
+	NamespaceType // 没有valud
 	// StringerType indicates that the field carries a fmt.Stringer.
-	StringerType  // 存于 Interface
+	StringerType // 存于 Interface
 	// ErrorType indicates that the field carries an error.
 	ErrorType // 存于 Interface
 	// SkipType indicates that the field is a no-op.

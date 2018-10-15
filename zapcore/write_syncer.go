@@ -31,7 +31,7 @@ import (
 // 有三个实现
 // 一个是就对io.write包了一层，啥都没干，和io.write一样
 // 一个是lock-write
-// 一个是multi-write
+// 一个是multi-write≤
 
 // A WriteSyncer is an io.Writer that can also flush any buffered data. Note
 // that *os.File (and thus, os.Stderr and os.Stdout) implement WriteSyncer.
@@ -134,7 +134,6 @@ func (ws multiWriteSyncer) Write(p []byte) (int, error) {
 		n, err := w.Write(p)
 		// multierr：append error
 		writeErr = multierr.Append(writeErr, err)
-
 
 		if nWritten == 0 && n != 0 {
 			// 以写长度为0，新写长度不等于0，将长度更新到已写长度

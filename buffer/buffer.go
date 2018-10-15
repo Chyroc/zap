@@ -34,7 +34,6 @@ const _size = 1024 // by default, create 1 KiB buffers
 // 可以reset/free
 // 可以获取len/cap
 
-
 // Buffer is a thin wrapper around a byte slice. It's intended to be pooled, so
 // the only way to construct one is via a Pool.
 type Buffer struct {

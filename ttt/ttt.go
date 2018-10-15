@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"go.uber.org/zap"
 	"time"
 )
@@ -11,6 +12,9 @@ type Book struct {
 }
 
 func main() {
+	time_2018_01_01_00_00_00 := time.Date(2018, time.January, 1, 0, 0, 0, 0, time.Local)
+	fmt.Println(time_2018_01_01_00_00_00.Weekday())
+	fmt.Println('1')
 
 	var err error
 	l, err := zap.NewProduction()

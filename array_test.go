@@ -114,7 +114,7 @@ func BenchmarkPool(b *testing.B) {
 			return make(map[string]interface{})
 		},
 	}
-	x:=5
+	x := 5
 
 	b.Run("", func(b *testing.B) {
 		for i := 0; i < b.N*x; i++ {
@@ -122,7 +122,6 @@ func BenchmarkPool(b *testing.B) {
 			x["1"] = true
 		}
 	})
-
 
 	b.Run("", func(b *testing.B) {
 		for i := 0; i < b.N*x; i++ {

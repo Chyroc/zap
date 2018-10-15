@@ -52,10 +52,10 @@ func (h *hooked) Check(ent Entry, ce *CheckedEntry) *CheckedEntry {
 	// also gives the downstream a chance to register itself directly with the
 	// CheckedEntry.
 	if downstream := h.Core.Check(ent, ce); downstream != nil {
-		debug.Println( "hooked.Check : true")
+		debug.Println("hooked.Check : true")
 		return downstream.AddCore(ent, h)
 	}
-	debug.Println( "hooked.Check : false")
+	debug.Println("hooked.Check : false")
 	return ce
 }
 

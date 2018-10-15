@@ -30,7 +30,6 @@ import (
 // 可以写入 fields
 // 可以同步
 
-
 // Core is a minimal, fast logger interface. It's designed for library authors
 // to wrap in a more user-friendly API.
 type Core interface {
@@ -91,10 +90,10 @@ func (c *ioCore) With(fields []Field) Core {
 
 func (c *ioCore) Check(ent Entry, ce *CheckedEntry) *CheckedEntry {
 	if c.Enabled(ent.Level) {
-		debug.Println( "ioCore.Check enable: true")
+		debug.Println("ioCore.Check enable: true")
 		return ce.AddCore(ent, c)
 	}
-	debug.Println( "ioCore.Check enable: false")
+	debug.Println("ioCore.Check enable: false")
 	return ce
 }
 

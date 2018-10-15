@@ -32,7 +32,6 @@ import (
 // console-encoder
 //
 
-
 // pool slice encoder-0-2
 var _sliceEncoderPool = sync.Pool{
 	New: func() interface{} {

@@ -41,7 +41,6 @@ type Level int8
 //
 // 可以设置，可以判断是否启动一个级别（这个是一个接口）
 
-
 const (
 	// DebugLevel logs are typically voluminous, and are usually disabled in
 	// production.
