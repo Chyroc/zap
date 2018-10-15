@@ -27,6 +27,8 @@ type Pool struct {
 	p *sync.Pool
 }
 
+// 这个package的文件是用于buffer的pool
+
 // NewPool constructs a new Pool.
 func NewPool() Pool {
 	// 新建pool

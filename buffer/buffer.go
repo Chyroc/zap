@@ -27,10 +27,16 @@ import "strconv"
 
 const _size = 1024 // by default, create 1 KiB buffers
 
+// 一个自定义的buffer
+// 底层是一个byte数组，初始长度1024
+// 用pool做了优化
+// 可以append多种数据结构：byte/string/int/float/（依赖了strconv）
+// 可以reset/free
+// 可以获取len/cap
+
+
 // Buffer is a thin wrapper around a byte slice. It's intended to be pooled, so
 // the only way to construct one is via a Pool.
-//
-// 一个自定义的buffer
 type Buffer struct {
 	bs   []byte
 	pool Pool
@@ -60,6 +66,7 @@ func (b *Buffer) AppendUint(i uint64) {
 
 // AppendBool appends a bool to the underlying buffer.
 func (b *Buffer) AppendBool(v bool) {
+	// 学习：使用 strconv 加 bool
 	b.bs = strconv.AppendBool(b.bs, v)
 }
 

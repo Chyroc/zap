@@ -26,6 +26,8 @@ import (
 	"go.uber.org/zap/buffer"
 )
 
+//待续
+
 // DefaultLineEnding defines the default line ending when writing logs.
 // Alternate line endings specified in EncoderConfig can override this
 // behavior.
@@ -136,6 +138,8 @@ func (e *TimeEncoder) UnmarshalText(text []byte) error {
 type DurationEncoder func(time.Duration, PrimitiveArrayEncoder)
 
 // SecondsDurationEncoder serializes a time.Duration to a floating-point number of seconds elapsed.
+//
+// 用秒处理时间， production 用
 func SecondsDurationEncoder(d time.Duration, enc PrimitiveArrayEncoder) {
 	enc.AppendFloat64(float64(d) / float64(time.Second))
 }
@@ -148,6 +152,8 @@ func NanosDurationEncoder(d time.Duration, enc PrimitiveArrayEncoder) {
 
 // StringDurationEncoder serializes a time.Duration using its built-in String
 // method.
+//
+// 用时间的字符串处理事件 dev 模式
 func StringDurationEncoder(d time.Duration, enc PrimitiveArrayEncoder) {
 	enc.AppendString(d.String())
 }
@@ -285,6 +291,8 @@ type ObjectEncoder interface {
 // array-like objects to the logging context. Of note, it supports mixed-type
 // arrays even though they aren't typical in Go. Like slices, ArrayEncoders
 // aren't safe for concurrent use (though typical use shouldn't require locks).
+//
+// array 强类型的添加array的logger ctx
 type ArrayEncoder interface {
 	// Built-in types.
 	PrimitiveArrayEncoder
@@ -305,6 +313,8 @@ type ArrayEncoder interface {
 // PrimitiveArrayEncoder is the subset of the ArrayEncoder interface that deals
 // only in Go's built-in types. It's included only so that Duration- and
 // TimeEncoders cannot trigger infinite recursion.
+//
+// 是处理 go 的 build-in 类型的 array 处理器
 type PrimitiveArrayEncoder interface {
 	// Built-in types.
 	AppendBool(bool)

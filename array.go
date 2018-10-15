@@ -143,6 +143,7 @@ func Errors(key string, errs []error) Field {
 	return Array(key, errArray(errs))
 }
 
+// bool 数组
 type bools []bool
 
 func (bs bools) MarshalLogArray(arr zapcore.ArrayEncoder) error {
@@ -152,6 +153,7 @@ func (bs bools) MarshalLogArray(arr zapcore.ArrayEncoder) error {
 	return nil
 }
 
+// byte-string 数组
 type byteStringsArray [][]byte
 
 func (bss byteStringsArray) MarshalLogArray(arr zapcore.ArrayEncoder) error {
@@ -161,6 +163,7 @@ func (bss byteStringsArray) MarshalLogArray(arr zapcore.ArrayEncoder) error {
 	return nil
 }
 
+// 复数 数组
 type complex128s []complex128
 
 func (nums complex128s) MarshalLogArray(arr zapcore.ArrayEncoder) error {
@@ -170,6 +173,7 @@ func (nums complex128s) MarshalLogArray(arr zapcore.ArrayEncoder) error {
 	return nil
 }
 
+// 复数 数组
 type complex64s []complex64
 
 func (nums complex64s) MarshalLogArray(arr zapcore.ArrayEncoder) error {
@@ -179,6 +183,7 @@ func (nums complex64s) MarshalLogArray(arr zapcore.ArrayEncoder) error {
 	return nil
 }
 
+// 时间段 数组
 type durations []time.Duration
 
 func (ds durations) MarshalLogArray(arr zapcore.ArrayEncoder) error {
@@ -188,6 +193,7 @@ func (ds durations) MarshalLogArray(arr zapcore.ArrayEncoder) error {
 	return nil
 }
 
+// 浮点数 数组
 type float64s []float64
 
 func (nums float64s) MarshalLogArray(arr zapcore.ArrayEncoder) error {
@@ -197,6 +203,7 @@ func (nums float64s) MarshalLogArray(arr zapcore.ArrayEncoder) error {
 	return nil
 }
 
+// 浮点数 数组
 type float32s []float32
 
 func (nums float32s) MarshalLogArray(arr zapcore.ArrayEncoder) error {
@@ -206,6 +213,7 @@ func (nums float32s) MarshalLogArray(arr zapcore.ArrayEncoder) error {
 	return nil
 }
 
+// int 数组
 type ints []int
 
 func (nums ints) MarshalLogArray(arr zapcore.ArrayEncoder) error {
@@ -215,6 +223,7 @@ func (nums ints) MarshalLogArray(arr zapcore.ArrayEncoder) error {
 	return nil
 }
 
+// int64 数组
 type int64s []int64
 
 func (nums int64s) MarshalLogArray(arr zapcore.ArrayEncoder) error {
@@ -224,6 +233,7 @@ func (nums int64s) MarshalLogArray(arr zapcore.ArrayEncoder) error {
 	return nil
 }
 
+// int32 数组
 type int32s []int32
 
 func (nums int32s) MarshalLogArray(arr zapcore.ArrayEncoder) error {
@@ -233,6 +243,7 @@ func (nums int32s) MarshalLogArray(arr zapcore.ArrayEncoder) error {
 	return nil
 }
 
+// int16 数组
 type int16s []int16
 
 func (nums int16s) MarshalLogArray(arr zapcore.ArrayEncoder) error {
@@ -242,6 +253,7 @@ func (nums int16s) MarshalLogArray(arr zapcore.ArrayEncoder) error {
 	return nil
 }
 
+// int8 数组
 type int8s []int8
 
 func (nums int8s) MarshalLogArray(arr zapcore.ArrayEncoder) error {
@@ -251,6 +263,7 @@ func (nums int8s) MarshalLogArray(arr zapcore.ArrayEncoder) error {
 	return nil
 }
 
+// string 数组
 type stringArray []string
 
 func (ss stringArray) MarshalLogArray(arr zapcore.ArrayEncoder) error {
@@ -260,6 +273,7 @@ func (ss stringArray) MarshalLogArray(arr zapcore.ArrayEncoder) error {
 	return nil
 }
 
+// time 数组
 type times []time.Time
 
 func (ts times) MarshalLogArray(arr zapcore.ArrayEncoder) error {
@@ -269,6 +283,7 @@ func (ts times) MarshalLogArray(arr zapcore.ArrayEncoder) error {
 	return nil
 }
 
+// uint 数组
 type uints []uint
 
 func (nums uints) MarshalLogArray(arr zapcore.ArrayEncoder) error {
@@ -278,6 +293,7 @@ func (nums uints) MarshalLogArray(arr zapcore.ArrayEncoder) error {
 	return nil
 }
 
+// uint64 数组
 type uint64s []uint64
 
 func (nums uint64s) MarshalLogArray(arr zapcore.ArrayEncoder) error {
@@ -287,6 +303,7 @@ func (nums uint64s) MarshalLogArray(arr zapcore.ArrayEncoder) error {
 	return nil
 }
 
+// uint32 数组
 type uint32s []uint32
 
 func (nums uint32s) MarshalLogArray(arr zapcore.ArrayEncoder) error {
@@ -296,6 +313,7 @@ func (nums uint32s) MarshalLogArray(arr zapcore.ArrayEncoder) error {
 	return nil
 }
 
+// uint16 数组
 type uint16s []uint16
 
 func (nums uint16s) MarshalLogArray(arr zapcore.ArrayEncoder) error {
@@ -305,6 +323,7 @@ func (nums uint16s) MarshalLogArray(arr zapcore.ArrayEncoder) error {
 	return nil
 }
 
+// uint8 数组
 type uint8s []uint8
 
 func (nums uint8s) MarshalLogArray(arr zapcore.ArrayEncoder) error {
@@ -314,6 +333,7 @@ func (nums uint8s) MarshalLogArray(arr zapcore.ArrayEncoder) error {
 	return nil
 }
 
+// uintptr 数组
 type uintptrs []uintptr
 
 func (nums uintptrs) MarshalLogArray(arr zapcore.ArrayEncoder) error {

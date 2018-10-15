@@ -69,6 +69,7 @@ func BenchmarkBuffers(b *testing.B) {
 	str := strings.Repeat("a", 1024)
 	slice := make([]byte, 1024)
 	buf := bytes.NewBuffer(slice)
+	builder := strings.Builder{}
 	custom := NewPool().Get()
 	b.Run("ByteSlice", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
@@ -80,6 +81,12 @@ func BenchmarkBuffers(b *testing.B) {
 		for i := 0; i < b.N; i++ {
 			buf.WriteString(str)
 			buf.Reset()
+		}
+	})
+	b.Run("StringsBuilder", func(b *testing.B) {
+		for i := 0; i < b.N; i++ {
+			builder.WriteString(str)
+			builder.Reset()
 		}
 	})
 	b.Run("CustomBuffer", func(b *testing.B) {

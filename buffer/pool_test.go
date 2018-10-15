@@ -31,6 +31,8 @@ func TestBuffers(t *testing.T) {
 	const dummyData = "dummy data"
 	p := NewPool()
 
+	// 测试 pool 并发安全
+
 	var wg sync.WaitGroup
 	for g := 0; g < 10; g++ {
 		wg.Add(1)

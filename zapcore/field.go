@@ -32,65 +32,69 @@ import (
 // and how it should be serialized.
 type FieldType uint8
 
-// 类型
+// 字段类型
+// 有build-in的，也有slicec和object，还有reflect和namespace
+// 属性：Key，Type，Integer，String，Interface
+// 实现了 ObjectEncoder 接口，都能添加
+// 可以判断是否和另外一个field相等
 
 const (
 	// UnknownType is the default field type. Attempting to add it to an encoder will panic.
-	UnknownType FieldType = iota // 0
+	UnknownType FieldType = iota // 未使用
 	// ArrayMarshalerType indicates that the field carries an ArrayMarshaler.
-	ArrayMarshalerType
+	ArrayMarshalerType// 存于 Interface
 	// ObjectMarshalerType indicates that the field carries an ObjectMarshaler.
-	ObjectMarshalerType
+	ObjectMarshalerType// 存于 Interface
 	// BinaryType indicates that the field carries an opaque binary blob.
-	BinaryType
+	BinaryType// 存于 Interface
 	// BoolType indicates that the field carries a bool.
-	BoolType
+	BoolType// 存于 Integer
 	// ByteStringType indicates that the field carries UTF-8 encoded bytes.
-	ByteStringType
+	ByteStringType  // 存于 Interface
 	// Complex128Type indicates that the field carries a complex128.
-	Complex128Type
+	Complex128Type// 存于 Interface
 	// Complex64Type indicates that the field carries a complex128.
-	Complex64Type
+	Complex64Type// 存于 Interface
 	// DurationType indicates that the field carries a time.Duration.
-	DurationType
+	DurationType// 存于 Integer
 	// Float64Type indicates that the field carries a float64.
-	Float64Type
+	Float64Type// 存于 Integer
 	// Float32Type indicates that the field carries a float32.
-	Float32Type  // 10
+	Float32Type // 存于 Integer
 	// Int64Type indicates that the field carries an int64.
-	Int64Type
+	Int64Type // 存于 Integer
 	// Int32Type indicates that the field carries an int32.
-	Int32Type
+	Int32Type// 存于 Integer
 	// Int16Type indicates that the field carries an int16.
-	Int16Type
+	Int16Type// 存于 Integer
 	// Int8Type indicates that the field carries an int8.
-	Int8Type
+	Int8Type// 存于 Integer
 	// StringType indicates that the field carries a string.
-	StringType
+	StringType// 存于 String
 	// TimeType indicates that the field carries a time.Time.
-	TimeType
+	TimeType // 秒存于 Integer，Location存于interface
 	// Uint64Type indicates that the field carries a uint64.
-	Uint64Type
+	Uint64Type// 存于 Integer
 	// Uint32Type indicates that the field carries a uint32.
-	Uint32Type
+	Uint32Type// 存于 Integer
 	// Uint16Type indicates that the field carries a uint16.
-	Uint16Type
+	Uint16Type// 存于 Integer
 	// Uint8Type indicates that the field carries a uint8.
-	Uint8Type  // 20
+	Uint8Type  // 存于 Integer
 	// UintptrType indicates that the field carries a uintptr.
-	UintptrType
+	UintptrType// 存于 Integer
 	// ReflectType indicates that the field carries an interface{}, which should
 	// be serialized using reflection.
-	ReflectType  // 22 <- map[string]interface{}
+	ReflectType  // 存于 Interface
 	// NamespaceType signals the beginning of an isolated namespace. All
 	// subsequent fields should be added to the new namespace.
-	NamespaceType
+	NamespaceType// 没有valud
 	// StringerType indicates that the field carries a fmt.Stringer.
-	StringerType
+	StringerType  // 存于 Interface
 	// ErrorType indicates that the field carries an error.
-	ErrorType
+	ErrorType // 存于 Interface
 	// SkipType indicates that the field is a no-op.
-	SkipType
+	SkipType // 没有valud
 )
 
 // A Field is a marshaling operation used to add a key-value pair to a logger's
@@ -121,7 +125,7 @@ func (f Field) AddTo(enc ObjectEncoder) {
 	case BinaryType:
 		enc.AddBinary(f.Key, f.Interface.([]byte))
 	case BoolType:
-		enc.AddBool(f.Key, f.Integer == 1)
+		enc.AddBool(f.Key, f.Integer == 1) // 说明 bool 类型的数据也是用 integer 存储
 	case ByteStringType:
 		enc.AddByteString(f.Key, f.Interface.([]byte))
 	case Complex128Type:

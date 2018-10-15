@@ -33,6 +33,8 @@ import (
 	"go.uber.org/multierr"
 )
 
+// check-entry
+
 // _cePool 是一个 *CheckedEntry  的pool
 var (
 	_cePool = sync.Pool{New: func() interface{} {
@@ -69,6 +71,10 @@ func NewEntryCaller(pc uintptr, file string, line int, ok bool) EntryCaller {
 		Defined: true,
 	}
 }
+
+// 调用者，记录着文件，行
+// 可以返回文件位置；也可以返回short的文件位置
+// pc 没有用到
 
 // EntryCaller represents the caller of a logging function.
 type EntryCaller struct {
@@ -142,6 +148,9 @@ func (ec EntryCaller) TrimmedPath() string {
 //
 // Entries are pooled, so any functions that accept them MUST be careful not to
 // retain references to them.
+//
+// Entry表示完整的日志消息。 条目的结构化上下文已经序列化，但日志级别，时间，消息和呼叫站点信息可供检查和修改。
+// Entry是pooled，因此任何接受它们的函数必须小心，不要保留对它们的引用。
 type Entry struct {
 	Level      Level
 	Time       time.Time
@@ -237,6 +246,9 @@ func (ce *CheckedEntry) Write(fields ...Field) {
 		exit.Exit()
 	}
 }
+
+// add-core
+// 将core添加到自身的core 列表，可以在nil上使用
 
 // AddCore adds a Core that has agreed to log this CheckedEntry. It's intended to be
 // used by Core.Check implementations, and is safe to call on nil CheckedEntry

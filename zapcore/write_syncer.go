@@ -27,6 +27,12 @@ import (
 	"go.uber.org/multierr"
 )
 
+// write-sync接口
+// 有三个实现
+// 一个是就对io.write包了一层，啥都没干，和io.write一样
+// 一个是lock-write
+// 一个是multi-write
+
 // A WriteSyncer is an io.Writer that can also flush any buffered data. Note
 // that *os.File (and thus, os.Stderr and os.Stdout) implement WriteSyncer.
 //
@@ -39,6 +45,8 @@ type WriteSyncer interface {
 // AddSync converts an io.Writer to a WriteSyncer. It attempts to be
 // intelligent: if the concrete type of the io.Writer implements WriteSyncer,
 // we'll use the existing Sync method. If it doesn't, we'll add a no-op Sync.
+//
+// 将一个 io.writer 变 WriteSyncer，如果是 WriteSyncer 就返回，否则只是假装报了一层 writer wrapper
 func AddSync(w io.Writer) WriteSyncer {
 	switch w := w.(type) {
 	case WriteSyncer:
@@ -48,6 +56,9 @@ func AddSync(w io.Writer) WriteSyncer {
 	}
 }
 
+// 实现WriteSyncer
+//
+// 用lock的方式
 type lockedWriteSyncer struct {
 	sync.Mutex
 	ws WriteSyncer
@@ -55,6 +66,8 @@ type lockedWriteSyncer struct {
 
 // Lock wraps a WriteSyncer in a mutex to make it safe for concurrent use. In
 // particular, *os.Files must be locked before use.
+//
+// 将 ws 包装为 lock-ws
 func Lock(ws WriteSyncer) WriteSyncer {
 	if _, ok := ws.(*lockedWriteSyncer); ok {
 		// no need to layer on another lock
@@ -63,6 +76,7 @@ func Lock(ws WriteSyncer) WriteSyncer {
 	return &lockedWriteSyncer{ws: ws}
 }
 
+// 锁 - 写 - 解锁
 func (s *lockedWriteSyncer) Write(bs []byte) (int, error) {
 	s.Lock()
 	n, err := s.ws.Write(bs)
@@ -70,6 +84,7 @@ func (s *lockedWriteSyncer) Write(bs []byte) (int, error) {
 	return n, err
 }
 
+// 锁 - 同步 - 解锁
 func (s *lockedWriteSyncer) Sync() error {
 	s.Lock()
 	err := s.ws.Sync()
@@ -77,6 +92,7 @@ func (s *lockedWriteSyncer) Sync() error {
 	return err
 }
 
+// 实现了 WriteSyncer 接口，特假
 type writerWrapper struct {
 	io.Writer
 }
@@ -85,10 +101,15 @@ func (w writerWrapper) Sync() error {
 	return nil
 }
 
+// 学习：a是A，多个a也是A
+//
+// 多 - multiWriteSyncer，也实现了 WriteSyncer
 type multiWriteSyncer []WriteSyncer
 
 // NewMultiWriteSyncer creates a WriteSyncer that duplicates its writes
 // and sync calls, much like io.MultiWriter.
+//
+// 用多个 WriteSyncer 搞一个新的 WriteSyncer
 func NewMultiWriteSyncer(ws ...WriteSyncer) WriteSyncer {
 	if len(ws) == 1 {
 		return ws[0]
@@ -101,21 +122,32 @@ func NewMultiWriteSyncer(ws ...WriteSyncer) WriteSyncer {
 // When not all underlying syncers write the same number of bytes,
 // the smallest number is returned even though Write() is called on
 // all of them.
+//
+// 实现 io.write 接口
 func (ws multiWriteSyncer) Write(p []byte) (int, error) {
 	var writeErr error
 	nWritten := 0
+
+	// 遍历 ws
 	for _, w := range ws {
+		// write
 		n, err := w.Write(p)
+		// multierr：append error
 		writeErr = multierr.Append(writeErr, err)
+
+
 		if nWritten == 0 && n != 0 {
+			// 以写长度为0，新写长度不等于0，将长度更新到已写长度
 			nWritten = n
 		} else if n < nWritten {
+			// 否则，已经有值，但是旧的已写值大于现在的，更新；也就是 nWritten 存 multi-write 的较小值
 			nWritten = n
 		}
 	}
 	return nWritten, writeErr
 }
 
+// 实现 write-sync 接口
 func (ws multiWriteSyncer) Sync() error {
 	var err error
 	for _, w := range ws {

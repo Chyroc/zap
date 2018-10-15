@@ -21,6 +21,7 @@
 package zap
 
 import (
+	"sync"
 	"testing"
 	"time"
 
@@ -104,4 +105,31 @@ func TestArrayWrappers(t *testing.T) {
 		assert.Equal(t, tt.expected, enc.Fields["k"], "%s: unexpected map contents.", tt.desc)
 		assert.Equal(t, 1, len(enc.Fields), "%s: found extra keys in map: %v", tt.desc, enc.Fields)
 	}
+}
+
+func BenchmarkPool(b *testing.B) {
+
+	var mapStringInterfacePool = sync.Pool{
+		New: func() interface{} {
+			return make(map[string]interface{})
+		},
+	}
+	x:=5
+
+	b.Run("", func(b *testing.B) {
+		for i := 0; i < b.N*x; i++ {
+			x := make(map[string]interface{})
+			x["1"] = true
+		}
+	})
+
+
+	b.Run("", func(b *testing.B) {
+		for i := 0; i < b.N*x; i++ {
+			y := mapStringInterfacePool.Get()
+			x := y.(map[string]interface{})
+			x["1"] = true
+			mapStringInterfacePool.Put(y)
+		}
+	})
 }

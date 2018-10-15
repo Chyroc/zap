@@ -24,7 +24,6 @@ import (
 	"bytes"
 	"errors"
 	"testing"
-
 	"io"
 
 	"github.com/stretchr/testify/assert"
