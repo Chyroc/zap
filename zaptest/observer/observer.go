@@ -25,6 +25,7 @@
 package observer // import "go.uber.org/zap/zaptest/observer"
 
 import (
+	"go.uber.org/zap/debug"
 	"strings"
 	"sync"
 	"time"
@@ -141,6 +142,7 @@ type contextObserver struct {
 
 func (co *contextObserver) Check(ent zapcore.Entry, ce *zapcore.CheckedEntry) *zapcore.CheckedEntry {
 	if co.Enabled(ent.Level) {
+		debug.Println("co.Enabled")
 		return ce.AddCore(ent, co)
 	}
 	return ce

@@ -24,6 +24,11 @@ import "go.uber.org/multierr"
 
 type multiCore []Core
 
+// tee
+// 0个core，返回nop-core
+// 1个core，返回core
+// 2个core，返回multi-core
+
 // NewTee creates a Core that duplicates log entries into two or more
 // underlying Cores.
 //
@@ -40,6 +45,8 @@ func NewTee(cores ...Core) Core {
 	}
 }
 
+// 下面是 multi-core实现 core
+
 func (mc multiCore) With(fields []Field) Core {
 	clone := make(multiCore, len(mc))
 	for i := range mc {
@@ -49,6 +56,7 @@ func (mc multiCore) With(fields []Field) Core {
 }
 
 func (mc multiCore) Enabled(lvl Level) bool {
+	// 只要有一个enable
 	for i := range mc {
 		if mc[i].Enabled(lvl) {
 			return true
@@ -58,6 +66,7 @@ func (mc multiCore) Enabled(lvl Level) bool {
 }
 
 func (mc multiCore) Check(ent Entry, ce *CheckedEntry) *CheckedEntry {
+	// 都要 check 一遍
 	for i := range mc {
 		ce = mc[i].Check(ent, ce)
 	}
@@ -75,6 +84,7 @@ func (mc multiCore) Write(ent Entry, fields []Field) error {
 func (mc multiCore) Sync() error {
 	var err error
 	for i := range mc {
+		// 遍历，sync，使用multi存储error
 		err = multierr.Append(err, mc[i].Sync())
 	}
 	return err

@@ -31,6 +31,16 @@ var errUnmarshalNilLevel = errors.New("can't unmarshal a nil *Level")
 // A Level is a logging priority. Higher levels are more important.
 type Level int8
 
+// log级别，分别是：debug - info - warn - error - dpanic - panic - fatal
+// debug 在 production 中禁用
+// info 默认
+// error 如果应用正常，不应该产生这个级别的日志
+// dpanic，dev模式，会先写message，再panic
+// panic，写message，然后panic
+// fatal，多一个os.exit
+//
+// 可以设置，可以判断是否启动一个级别（这个是一个接口）
+
 const (
 	// DebugLevel logs are typically voluminous, and are usually disabled in
 	// production.
@@ -77,6 +87,8 @@ func (l Level) String() string {
 	}
 }
 
+// 大写的string
+
 // CapitalString returns an all-caps ASCII representation of the log level.
 func (l Level) CapitalString() string {
 	// Printing levels in all-caps is common enough that we should export this
@@ -101,6 +113,8 @@ func (l Level) CapitalString() string {
 	}
 }
 
+// 实现 encoding.TextMarshaler / encoding.TextUnmarshaler 接口
+//
 // MarshalText marshals the Level to text. Note that the text representation
 // drops the -Level suffix (see example).
 func (l Level) MarshalText() ([]byte, error) {
@@ -173,3 +187,5 @@ func (l Level) Enabled(lvl Level) bool {
 type LevelEnabler interface {
 	Enabled(Level) bool
 }
+
+// 学习，因为 LevelEnabler 是个接口，所以可以被其他接口嵌套

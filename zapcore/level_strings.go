@@ -38,6 +38,8 @@ var (
 	_levelToCapitalColorString   = make(map[Level]string, len(_levelToColor))
 )
 
+// 学习：先跑init外，再跑init
+
 func init() {
 	for level, color := range _levelToColor {
 		_levelToLowercaseColorString[level] = color.Add(level.String())

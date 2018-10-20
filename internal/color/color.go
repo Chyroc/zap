@@ -23,6 +23,8 @@ package color
 
 import "fmt"
 
+// 学习：输出颜色的方法
+
 // Foreground colors.
 const (
 	Black Color = iota + 30

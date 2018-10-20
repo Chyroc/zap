@@ -22,6 +22,7 @@ package zapcore
 
 import (
 	"fmt"
+	"go.uber.org/zap/debug"
 	"strings"
 	"sync"
 	"time"
@@ -32,6 +33,9 @@ import (
 	"go.uber.org/multierr"
 )
 
+// check-entry
+
+// _cePool 是一个 *CheckedEntry  的pool
 var (
 	_cePool = sync.Pool{New: func() interface{} {
 		// Pre-allocate some space for cores.
@@ -67,6 +71,10 @@ func NewEntryCaller(pc uintptr, file string, line int, ok bool) EntryCaller {
 		Defined: true,
 	}
 }
+
+// 调用者，记录着文件，行
+// 可以返回文件位置；也可以返回short的文件位置
+// pc 没有用到
 
 // EntryCaller represents the caller of a logging function.
 type EntryCaller struct {
@@ -140,6 +148,9 @@ func (ec EntryCaller) TrimmedPath() string {
 //
 // Entries are pooled, so any functions that accept them MUST be careful not to
 // retain references to them.
+//
+// Entry表示完整的日志消息。 条目的结构化上下文已经序列化，但日志级别，时间，消息和呼叫站点信息可供检查和修改。
+// Entry是pooled，因此任何接受它们的函数必须小心，不要保留对它们的引用。
 type Entry struct {
 	Level      Level
 	Time       time.Time
@@ -192,6 +203,8 @@ func (ce *CheckedEntry) reset() {
 // Write writes the entry to the stored Cores, returns any errors, and returns
 // the CheckedEntry reference to a pool for immediate re-use. Finally, it
 // executes any required CheckWriteAction.
+//
+// 写
 func (ce *CheckedEntry) Write(fields ...Field) {
 	if ce == nil {
 		return
@@ -210,8 +223,10 @@ func (ce *CheckedEntry) Write(fields ...Field) {
 	}
 	ce.dirty = true
 
+	// 写数据
 	var err error
 	for i := range ce.cores {
+		fmt.Printf("%#v\n", ce.cores[i])
 		err = multierr.Append(err, ce.cores[i].Write(ce.Entry, fields))
 	}
 	if ce.ErrorOutput != nil {
@@ -232,6 +247,9 @@ func (ce *CheckedEntry) Write(fields ...Field) {
 	}
 }
 
+// add-core
+// 将core添加到自身的core 列表，可以在nil上使用
+
 // AddCore adds a Core that has agreed to log this CheckedEntry. It's intended to be
 // used by Core.Check implementations, and is safe to call on nil CheckedEntry
 // references.
@@ -240,6 +258,8 @@ func (ce *CheckedEntry) AddCore(ent Entry, core Core) *CheckedEntry {
 		ce = getCheckedEntry()
 		ce.Entry = ent
 	}
+	// 添加 ce
+	debug.Println("ce.cores.append")
 	ce.cores = append(ce.cores, core)
 	return ce
 }

@@ -76,6 +76,7 @@ type causer interface {
 // that would require exporting errArray as part of the zapcore API.
 
 // Encodes a list of errors using the standard error encoding logic.
+// err 数据
 type errArray []error
 
 func (errs errArray) MarshalLogArray(arr ArrayEncoder) error {

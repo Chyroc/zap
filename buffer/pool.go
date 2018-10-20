@@ -27,10 +27,14 @@ type Pool struct {
 	p *sync.Pool
 }
 
+// 这个package的文件是用于buffer的pool
+
 // NewPool constructs a new Pool.
 func NewPool() Pool {
+	// 新建pool
 	return Pool{p: &sync.Pool{
 		New: func() interface{} {
+			// new方法是：搞一个 buffer ：长度0，容量1024的bytes
 			return &Buffer{bs: make([]byte, 0, _size)}
 		},
 	}}

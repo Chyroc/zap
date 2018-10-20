@@ -25,7 +25,10 @@ package bufferpool
 import "go.uber.org/zap/buffer"
 
 var (
+	// _pool 是一个 buffer 包的一个pool
 	_pool = buffer.NewPool()
 	// Get retrieves a buffer from the pool, creating one if necessary.
+
+	// Get 是一个 buffer的 Buffer
 	Get = _pool.Get
 )

@@ -24,15 +24,21 @@ package exit
 
 import "os"
 
+//一个可以被mock的exit
+
 var real = func() { os.Exit(1) }
 
 // Exit normally terminates the process by calling os.Exit(1). If the package
 // is stubbed, it instead records a call in the testing spy.
+//
+// exit
 func Exit() {
 	real()
 }
 
 // A StubbedExit is a testing fake for os.Exit.
+//
+// test-fake exit
 type StubbedExit struct {
 	Exited bool
 	prev   func()

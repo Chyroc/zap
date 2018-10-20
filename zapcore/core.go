@@ -20,6 +20,16 @@
 
 package zapcore
 
+import (
+	"go.uber.org/zap/debug"
+)
+
+// core log接口
+// 可以判断enable等级
+// 可以检查一个Entry是否应该log
+// 可以写入 fields
+// 可以同步
+
 // Core is a minimal, fast logger interface. It's designed for library authors
 // to wrap in a more user-friendly API.
 type Core interface {
@@ -43,6 +53,8 @@ type Core interface {
 	// Sync flushes buffered logs (if any).
 	Sync() error
 }
+
+// nop-core 啥都不干
 
 type nopCore struct{}
 
@@ -69,6 +81,7 @@ type ioCore struct {
 	out WriteSyncer
 }
 
+// with
 func (c *ioCore) With(fields []Field) Core {
 	clone := c.clone()
 	addFields(clone.enc, fields)
@@ -77,21 +90,31 @@ func (c *ioCore) With(fields []Field) Core {
 
 func (c *ioCore) Check(ent Entry, ce *CheckedEntry) *CheckedEntry {
 	if c.Enabled(ent.Level) {
+		debug.Println("ioCore.Check enable: true")
 		return ce.AddCore(ent, c)
 	}
+	debug.Println("ioCore.Check enable: false")
 	return ce
 }
 
+// 这个是写
 func (c *ioCore) Write(ent Entry, fields []Field) error {
+	debug.Println("io.Write")
+
 	buf, err := c.enc.EncodeEntry(ent, fields)
 	if err != nil {
 		return err
 	}
+
+	// 写，然后清空内存
 	_, err = c.out.Write(buf.Bytes())
 	buf.Free()
 	if err != nil {
 		return err
 	}
+
+	// 如果大于 error 错误（panic）
+	// 不懂？？
 	if ent.Level > ErrorLevel {
 		// Since we may be crashing the program, sync the output. Ignore Sync
 		// errors, pending a clean solution to issue #370.

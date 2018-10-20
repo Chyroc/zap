@@ -38,6 +38,8 @@ func Skip() Field {
 	return Field{Type: zapcore.SkipType}
 }
 
+// 这个里面都是非slice的数据
+
 // Binary constructs a field that carries an opaque binary blob.
 //
 // Binary data is serialized in an encoding-appropriate format. For example,
@@ -59,6 +61,8 @@ func Bool(key string, val bool) Field {
 // ByteString constructs a field that carries UTF-8 encoded text as a []byte.
 // To log opaque binary blobs (which aren't necessarily valid UTF-8), use
 // Binary.
+//
+// 写的是 bytes，但是渲染 string，懒加载
 func ByteString(key string, val []byte) Field {
 	return Field{Key: key, Type: zapcore.ByteStringType, Interface: val}
 }
@@ -117,6 +121,8 @@ func Int8(key string, val int8) Field {
 }
 
 // String constructs a field with the given key and value.
+//
+// string
 func String(key string, val string) Field {
 	return Field{Key: key, Type: zapcore.StringType, String: val}
 }
@@ -158,6 +164,8 @@ func Uintptr(key string, val uintptr) Field {
 //
 // If encoding fails (e.g., trying to serialize a map[int]string to JSON), Reflect
 // includes the error message in the final log output.
+//
+// 还可以是 reflect
 func Reflect(key string, val interface{}) Field {
 	return Field{Key: key, Type: zapcore.ReflectType, Interface: val}
 }
@@ -216,12 +224,18 @@ func Object(key string, val zapcore.ObjectMarshaler) Field {
 // Since byte/uint8 and rune/int32 are aliases, Any can't differentiate between
 // them. To minimize surprises, []byte values are treated as binary blobs, byte
 // values are treated as uint8, and runes are always treated as integers.
+//
+// any 可以是任何值
 func Any(key string, value interface{}) Field {
+	// 类型断言
+
+	// 学习：类型断言还可以写接口 interface
+
 	switch val := value.(type) {
 	case zapcore.ObjectMarshaler:
-		return Object(key, val)
+		return Object(key, val) // object
 	case zapcore.ArrayMarshaler:
-		return Array(key, val)
+		return Array(key, val) // array
 	case bool:
 		return Bool(key, val)
 	case []bool:
@@ -303,8 +317,8 @@ func Any(key string, value interface{}) Field {
 	case []error:
 		return Errors(key, val)
 	case fmt.Stringer:
-		return Stringer(key, val)
+		return Stringer(key, val) // 定义了一个 String 的接口
 	default:
-		return Reflect(key, val)
+		return Reflect(key, val) // reflect
 	}
 }

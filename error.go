@@ -49,6 +49,7 @@ func NamedError(key string, err error) Field {
 	return Field{Key: key, Type: zapcore.ErrorType, Interface: err}
 }
 
+// err 数组
 type errArray []error
 
 func (errs errArray) MarshalLogArray(arr zapcore.ArrayEncoder) error {

@@ -27,6 +27,13 @@ import "strconv"
 
 const _size = 1024 // by default, create 1 KiB buffers
 
+// 一个自定义的buffer
+// 底层是一个byte数组，初始长度1024
+// 用pool做了优化
+// 可以append多种数据结构：byte/string/int/float/（依赖了strconv）
+// 可以reset/free
+// 可以获取len/cap
+
 // Buffer is a thin wrapper around a byte slice. It's intended to be pooled, so
 // the only way to construct one is via a Pool.
 type Buffer struct {
@@ -46,6 +53,7 @@ func (b *Buffer) AppendString(s string) {
 
 // AppendInt appends an integer to the underlying buffer (assuming base 10).
 func (b *Buffer) AppendInt(i int64) {
+	// 学习：AppendInt
 	b.bs = strconv.AppendInt(b.bs, i, 10)
 }
 
@@ -57,6 +65,7 @@ func (b *Buffer) AppendUint(i uint64) {
 
 // AppendBool appends a bool to the underlying buffer.
 func (b *Buffer) AppendBool(v bool) {
+	// 学习：使用 strconv 加 bool
 	b.bs = strconv.AppendBool(b.bs, v)
 }
 
@@ -67,11 +76,14 @@ func (b *Buffer) AppendFloat(f float64, bitSize int) {
 }
 
 // Len returns the length of the underlying byte slice.
+// 长度
 func (b *Buffer) Len() int {
 	return len(b.bs)
 }
 
 // Cap returns the capacity of the underlying byte slice.
+// 容量
+// 疑问：这个性能应该小于strings.Builder吧
 func (b *Buffer) Cap() int {
 	return cap(b.bs)
 }
@@ -89,17 +101,20 @@ func (b *Buffer) String() string {
 // Reset resets the underlying byte slice. Subsequent writes re-use the slice's
 // backing array.
 func (b *Buffer) Reset() {
+	// reset，但是底层数据没有更新，所以会复用
 	b.bs = b.bs[:0]
 }
 
 // Write implements io.Writer.
 func (b *Buffer) Write(bs []byte) (int, error) {
+	// 和append一样，但是实现了 writer 接口
 	b.bs = append(b.bs, bs...)
 	return len(bs), nil
 }
 
 // TrimNewline trims any final "\n" byte from the end of the buffer.
 func (b *Buffer) TrimNewline() {
+	// 去掉所有的 \n
 	if i := len(b.bs) - 1; i >= 0 {
 		if b.bs[i] == '\n' {
 			b.bs = b.bs[:i]
